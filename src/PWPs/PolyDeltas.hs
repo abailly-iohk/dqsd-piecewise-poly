@@ -164,6 +164,8 @@ convolvePolyDeltas ::
 -- For a delta, lower == upper (invariant to be checked), and the effect of the delta is to translate the other
 -- argument (whichever it is) along by this amount. Need to ensure there is still an initial interval based at zero.
 convolvePolyDeltas (lf, uf, Pd f) (lg, ug, Pd g)
+  | ug == lg = [(lf, Pd f)]
+  | uf == lf = [(lg, Pd g)]
   | (uf <= lf) || (ug <= lg) = error $ "Invalid polynomial interval width: " <> show (lf, uf, lg, ug)
   -- convolve the polynomials to get a list of intervals, put the type back and remove redundant intervals
   | otherwise = aggregate $ map (\(x, p) -> (x, Pd p)) (convolvePolys (lf, uf, f) (lg, ug, g))
@@ -259,14 +261,14 @@ displayPolyDelta _ (l, u, D x)
   | l /= u = error "Non-zero delta interval"
   | otherwise = Left (l, x)
 displayPolyDelta s (l, u, Pd p)
-  | l >= u = error "Invalid polynomial interval"
+  | l > u = error "Invalid polynomial interval"
   | otherwise = Right (displayPoly p (l, u) s)
 instance OrdNumEqFrac a => Displayable a (PolyDelta a) where
   displayObject = displayPolyDelta
 
 displayPolyHeaviside :: OrdNumEqFrac a => a -> (a, a, PolyHeaviside a) -> Either (a, a) [(a, a)]
 displayPolyHeaviside s (l, u, Ph p) =
-  if l >= u
+  if l > u
     then error "Invalid polynomial interval"
     else Right (displayPoly p (l, u) s)
 displayPolyHeaviside _ (l, u, H x _) =
