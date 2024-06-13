@@ -282,8 +282,8 @@ infix 7 <+>
 disaggregate :: (Num a, Show a, Eq a, HasCallStack, Show o) => [Piece a o] -> [(a, a, o)]
 disaggregate [] = error "Empty piece list"
 disaggregate [x] = [(basepoint x, 1 + 2 * basepoint x, object x)] -- turn the last piece into an 'infinite' interval
-disaggregate (x : xs@(x' : _))
-  | otherwise = (basepoint x, basepoint x', object x) : disaggregate xs
+disaggregate (x : xs@(x' : _)) =
+  (basepoint x, basepoint x', object x) : disaggregate xs
 
 displayPolyDeltaIntervals :: (Ord a, Enum a, Eq a, Fractional a, Num a, Displayable a b, Show a, Show b) => Pieces a b -> a -> [Either (a, a) [(a, a)]]
 displayPolyDeltaIntervals as spacing = map (displayObject spacing) $ disaggregate (getPieces as)
