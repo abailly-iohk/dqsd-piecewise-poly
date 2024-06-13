@@ -16,12 +16,7 @@
 -- We will only be combining a delta and a poly over a zero interval, where the delta dominates.
 -- We can define the operators in a way that keeps the deltas intact and makes the
 -- piecewise integration/differentiation work.
-module PWPs.PolyDeltas (
-  PolyDelta (..),
-  PolyHeaviside (..),
-  polyHeavisideRoot,
-)
-where
+module PWPs.PolyDeltas where
 
 import GHC.Stack (HasCallStack)
 import PWPs.ConvolutionClasses

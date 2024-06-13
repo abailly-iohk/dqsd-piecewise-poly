@@ -63,12 +63,12 @@ library
                     , PWPs.IRVs
                     , DeltaQ.Model.DeltaQ
                     , DeltaQ.Model.Utilities
-
-    -- Modules included in this library but not exported.
-    other-modules:    PWPs.Piecewise
+                    , PWPs.Piecewise
                     , PWPs.PolyDeltas
                     , PWPs.SimplePolynomials
-                    , PWPs.ConvolutionClasses
+
+    -- Modules included in this library but not exported.
+    other-modules:    PWPs.ConvolutionClasses
                     , DeltaQ.Model.Introspection
 
     -- LANGUAGE extensions used by modules in this package.
@@ -121,4 +121,11 @@ test-suite dqsd-piecewise-poly-test
     -- Test dependencies.
     build-depends:
         base,
-        dqsd-piecewise-poly
+        dqsd-piecewise-poly,
+        hspec,
+        QuickCheck
+
+    build-tool-depends:
+       hspec-discover:hspec-discover
+
+    ghc-options: -rtsopts -threaded

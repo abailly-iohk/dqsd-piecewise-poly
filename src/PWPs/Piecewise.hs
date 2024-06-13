@@ -40,9 +40,17 @@ module PWPs.Piecewise (
   displayPolyDeltaIntervals,
 ) where
 
-import Debug.Trace (trace)
+import Data.Function (fix)
 import GHC.Stack (HasCallStack)
-import PWPs.ConvolutionClasses
+import PWPs.ConvolutionClasses (
+  CompactConvolvable (..),
+  Comparable (..),
+  Differentiable (..),
+  Displayable (..),
+  Evaluable (..),
+  Integrable (..),
+  Mergeable (..),
+ )
 
 data Piece a o = Piece
   { basepoint :: a
@@ -59,20 +67,25 @@ makePiece (x, y) = Piece{basepoint = x, object = y}
 
 newtype Pieces a o = Pieces {getPieces :: [Piece a o]}
   deriving (Eq, Show)
+
 instance Functor (Pieces a) where
   fmap f = Pieces . map (fmap f) . getPieces
 
 -- |
 --     We run through a set of pieces, merging intervals whose objects are declared mergeable
 mergePieces :: Mergeable b => Pieces a b -> Pieces a b
-mergePieces f = Pieces (doMerge (getPieces f))
+mergePieces f = fix mergeRecursive (False, getPieces f)
  where
-  doMerge :: Mergeable b => [Piece a b] -> [Piece a b]
-  doMerge [] = [] -- can occur when we have merged the last two pieces
-  doMerge [x] = [x] -- stop when there's nothing left to merge
+  doMerge [] = (True, []) -- can occur when we have merged the last two pieces
+  doMerge [x] = (True, [x]) -- stop when there's nothing left to merge
   doMerge (x0 : x1 : xs) = case mergeObject (object x0) (object x1) of
-    Nothing -> x0 : doMerge (x1 : xs) -- can't merge so just move on
-    Just o -> (Piece{basepoint = basepoint x0, object = o}) : doMerge xs -- extend interval through second basepoint
+    Nothing ->
+      let (r, ps') = doMerge (x1 : xs)
+       in (r, x0 : ps') -- can't merge so just move on
+    Just o ->
+      (False, (Piece{basepoint = basepoint x0, object = o}) : snd (doMerge xs)) -- merge the two objects and move on
+  mergeRecursive _ (True, ps) = Pieces ps
+  mergeRecursive rec (False, ps) = rec (doMerge ps)
 
 combinePieces :: (Num a, Eq a, Ord a, Mergeable b, Mergeable c, Mergeable d) => (b -> c -> d) -> Pieces a b -> Pieces a c -> Pieces a d
 
@@ -270,12 +283,7 @@ disaggregate :: (Num a, Show a, Eq a, HasCallStack, Show o) => [Piece a o] -> [(
 disaggregate [] = error "Empty piece list"
 disaggregate [x] = [(basepoint x, 1 + 2 * basepoint x, object x)] -- turn the last piece into an 'infinite' interval
 disaggregate (x : xs@(x' : _))
-  | otherwise =
-      if basepoint x == basepoint x'
-        then
-          trace ("zero width interval" <> show x <> " - " <> show x') $
-            (basepoint x, basepoint x', object x) : disaggregate xs
-        else (basepoint x, basepoint x', object x) : disaggregate xs
+  | otherwise = (basepoint x, basepoint x', object x) : disaggregate xs
 
 displayPolyDeltaIntervals :: (Ord a, Enum a, Eq a, Fractional a, Num a, Displayable a b, Show a, Show b) => Pieces a b -> a -> [Either (a, a) [(a, a)]]
 displayPolyDeltaIntervals as spacing = map (displayObject spacing) $ disaggregate (getPieces as)
