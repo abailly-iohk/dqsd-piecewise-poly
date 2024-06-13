@@ -60,6 +60,7 @@ module PWPs.IRVs (
 )
 where
 
+import GHC.Stack (HasCallStack)
 import PWPs.ConvolutionClasses (
   Differentiable (..),
   Evaluable (evaluate),
@@ -86,7 +87,7 @@ import PWPs.PolyDeltas (
  )
 import PWPs.SimplePolynomials (Poly (..), makeMonomial, makePoly)
 
-type MyConstraints a = (Fractional a, Ord a, Num a, Enum a, Eq a, Show a)
+type MyConstraints a = (Fractional a, Ord a, Num a, Enum a, Eq a, Show a, HasCallStack)
 type DistD a = Pieces a (PolyDelta a)
 type DistH a = Pieces a (PolyHeaviside a)
 

@@ -23,6 +23,7 @@ module PWPs.PolyDeltas (
 )
 where
 
+import GHC.Stack (HasCallStack)
 import PWPs.ConvolutionClasses
 import PWPs.SimplePolynomials as SP
 
@@ -158,7 +159,7 @@ aggregate ((bx, x) : (by, y) : xs)
   | otherwise = (bx, x) : aggregate ((by, y) : xs)
 
 convolvePolyDeltas ::
-  (Num a, Fractional a, Ord a, Show a) =>
+  (Num a, Fractional a, Ord a, Show a, HasCallStack) =>
   (a, a, PolyDelta a) ->
   (a, a, PolyDelta a) ->
   [(a, PolyDelta a)]
