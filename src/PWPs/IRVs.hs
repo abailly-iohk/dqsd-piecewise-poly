@@ -100,7 +100,7 @@ top = PDF (makePieces [(0, D 1), (0, Pd 0)])
 bottom :: (Ord a, Num a) => IRV a
 bottom = CDF (makePieces [(0, Ph 0)])
 
-cumulativeMass :: (Ord a, Enum a, Num a, Fractional a, Evaluable a (DistH a), Integrable (DistD a) (DistH a)) => IRV a -> a -> a
+cumulativeMass :: (Ord a, Enum a, Num a, Fractional a, Evaluable a (DistH a), Integrable (DistD a) (DistH a), Show a) => IRV a -> a -> a
 cumulativeMass x p = last $ evaluate p (makeCDF x)
 
 shiftIRV :: (Fractional a, Ord a, Num a, Enum a, Eq a, Differentiable (DistH a) (DistD a), Show a) => a -> IRV a -> IRV a
@@ -114,7 +114,7 @@ makePDF :: (Fractional a, Ord a, Num a, Enum a, Eq a, Differentiable (DistH a) (
 makePDF (PDF x) = x
 makePDF (CDF x) = differentiate x
 
-makeCDF :: (Fractional a, Ord a, Num a, Enum a, Eq a, Integrable (DistD a) (DistH a)) => IRV a -> DistH a
+makeCDF :: (Fractional a, Ord a, Num a, Enum a, Eq a, Show a, Integrable (DistD a) (DistH a)) => IRV a -> DistH a
 
 -- | Force an IRV into a CDF by integrating if necessary
 makeCDF (CDF x) = x
@@ -376,7 +376,7 @@ data Moments a = Moments
   }
   deriving (Eq, Show)
 moments ::
-  (Fractional a, Ord a, Num a, Enum a, Eq a, Integrable (DistD a) (DistH a), Evaluable a (DistD a), Evaluable a (DistH a)) =>
+  (Fractional a, Ord a, Num a, Enum a, Eq a, Integrable (DistD a) (DistH a), Evaluable a (DistD a), Evaluable a (DistH a), Show a) =>
   IRV a ->
   Moments a
 
@@ -393,7 +393,7 @@ moments f =
   -- Compute the definite integral of x^nf(x)dx
   xNIntegral n g = piecesFinalValue (integralOfxToTheNtimesFx n g)
    where
-    integralOfxToTheNtimesFx :: (Fractional a, Ord a, Num a, Enum a, Eq a) => Int -> IRV a -> DistH a
+    integralOfxToTheNtimesFx :: (Fractional a, Ord a, Num a, Enum a, Eq a, Show a) => Int -> IRV a -> DistH a
     integralOfxToTheNtimesFx n' f' = integrate (applyObject (*) (Pd $ makeMonomial n' 1) $ makePDF f')
   tau = xNIntegral 0 f
   -- catch case of bottom, otherwise scale back up to a proper distribution

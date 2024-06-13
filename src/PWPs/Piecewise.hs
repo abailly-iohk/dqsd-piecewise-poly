@@ -40,6 +40,7 @@ module PWPs.Piecewise (
   displayPolyDeltaIntervals,
 ) where
 
+import Debug.Trace (trace)
 import GHC.Stack (HasCallStack)
 import PWPs.ConvolutionClasses
 
@@ -176,14 +177,14 @@ instance (Num a, Eq a, Ord a, Differentiable b c, Mergeable c, Evaluable a b) =>
   --        Since constants all differentate to zero, it is worth checking whether pieces can be merged.
   --
   differentiate = mergePieces . fmap differentiate
-instance (Num a, Eq a, Ord a, Integrable b c, Mergeable c, Evaluable a c) => Integrable (Pieces a b) (Pieces a c) where
+instance (Num a, Eq a, Ord a, Integrable b c, Mergeable c, Evaluable a c, Show a, Show b) => Integrable (Pieces a b) (Pieces a c) where
   integrate = integratePieces
 
 -- |
 -- For piecewise integration we need to evaluate at the boundary points to make the pieces join up.
 -- We need to pass the integrated object to the next interation so that it can be evaluated on the basepoint
 -- and to recognise deltas and pass them through as well as evaluating them
-integratePieces :: (Num a, Eq a, Ord a, Integrable b c, Evaluable a c) => Pieces a b -> Pieces a c
+integratePieces :: (Num a, Eq a, Ord a, Integrable b c, Evaluable a c, Show a, Show b) => Pieces a b -> Pieces a c
 integratePieces ps = Pieces (goInt 0 (disaggregate (getPieces ps)))
  where
   goInt :: (Num a, Eq a, Ord a, Integrable b c, Evaluable a c) => a -> [(a, a, b)] -> [Piece a c]
@@ -242,12 +243,15 @@ instance (Num a, Eq a, Ord a, Evaluable a b) => Evaluable a (Pieces a b) where
   ( Ord a
   , Num a
   , Enum a
+  , Show a
+  , Eq a
   , Fractional a
   , Num b
   , Mergeable b
   , Evaluable a b
   , CompactConvolvable a b
   , HasCallStack
+  , Show b
   ) =>
   Pieces a b ->
   Pieces a b ->
@@ -262,12 +266,18 @@ infix 7 <+>
   dbs = disaggregate (getPieces bs)
 
 -- | disaggregate takes a Pieces list and produces a list of separate bounded intervals
-disaggregate :: Num a => [Piece a o] -> [(a, a, o)]
+disaggregate :: (Num a, Show a, Eq a, HasCallStack, Show o) => [Piece a o] -> [(a, a, o)]
 disaggregate [] = error "Empty piece list"
 disaggregate [x] = [(basepoint x, 1 + 2 * basepoint x, object x)] -- turn the last piece into an 'infinite' interval
-disaggregate (x : xs@(x' : _)) = (basepoint x, basepoint x', object x) : disaggregate xs
+disaggregate (x : xs@(x' : _))
+  | otherwise =
+      if basepoint x == basepoint x'
+        then
+          trace ("zero width interval" <> show x <> " - " <> show x') $
+            (basepoint x, basepoint x', object x) : disaggregate xs
+        else (basepoint x, basepoint x', object x) : disaggregate xs
 
-displayPolyDeltaIntervals :: (Ord a, Enum a, Eq a, Fractional a, Num a, Displayable a b) => Pieces a b -> a -> [Either (a, a) [(a, a)]]
+displayPolyDeltaIntervals :: (Ord a, Enum a, Eq a, Fractional a, Num a, Displayable a b, Show a, Show b) => Pieces a b -> a -> [Either (a, a) [(a, a)]]
 displayPolyDeltaIntervals as spacing = map (displayObject spacing) $ disaggregate (getPieces as)
 
 (><) :: (Eq a, Num a, Evaluable a b) => a -> Pieces a b -> Pieces a b
@@ -277,7 +287,7 @@ infix 7 ><
 
 (><) = fmap . scale
 
-comparePW :: (Fractional a, Eq a, Ord a, Comparable a b, Num b, Mergeable b, Evaluable a b) => Pieces a b -> Pieces a b -> Maybe Ordering
+comparePW :: (Fractional a, Eq a, Ord a, Show a, Comparable a b, Num b, Mergeable b, Evaluable a b, Show b) => Pieces a b -> Pieces a b -> Maybe Ordering
 
 -- | Check whether the pieces are all comparable, and if so if all compare the same way
 comparePW x' y' = goCompare (Just EQ) $ disaggregate $ getPieces $ alignPieces x' y'

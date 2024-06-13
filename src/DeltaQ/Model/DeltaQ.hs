@@ -156,7 +156,7 @@ class DeltaQ icdf => DeltaQOps icdf where
   convolve :: HasCallStack => icdf -> icdf -> icdf
 
   -- | multiple sequence steps
-  nWayConvolve :: [icdf] -> icdf
+  nWayConvolve :: HasCallStack => [icdf] -> icdf
 
   -- | First to finish progression
   ftf :: icdf -> icdf -> icdf
