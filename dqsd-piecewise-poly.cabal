@@ -61,15 +61,15 @@ library
     exposed-modules:  DeltaQ.Class
                     , DeltaQ.PWPs
                     , PWPs.IRVs
+                    , DeltaQ.Model.DeltaQ
+                    , DeltaQ.Model.Utilities
 
     -- Modules included in this library but not exported.
     other-modules:    PWPs.Piecewise
                     , PWPs.PolyDeltas
                     , PWPs.SimplePolynomials
                     , PWPs.ConvolutionClasses
-                    , DeltaQ.Model.DeltaQ
                     , DeltaQ.Model.Introspection
-                    , DeltaQ.Model.Utilities
 
     -- LANGUAGE extensions used by modules in this package.
     other-extensions:   GeneralizedNewtypeDeriving

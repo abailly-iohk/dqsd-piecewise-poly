@@ -1,30 +1,31 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-# LANGUAGE TypeFamilies, FlexibleInstances, MultiParamTypeClasses #-}
 
-module DeltaQ.PWPs
- (
-   IRV
- , ProbabilityMass(..)
- , DeltaQ(..)
- , DeltaQOps(..)
- , DeltaQ𝛩(..)
- , DeltaQTimeout(..)
- , DeltaQUniform(..)
- , DeltaQIntrospection(..)
- , Slazard(..)
- , DeltaQVisualisation(..)
- , module DeltaQ.Model.Utilities
- , shiftedHeaviside
- )
+module DeltaQ.PWPs (
+  IRV,
+  ProbabilityMass (..),
+  DeltaQ (..),
+  DeltaQOps (..),
+  DeltaQ𝛩 (..),
+  DeltaQTimeout (..),
+  DeltaQUniform (..),
+  DeltaQIntrospection (..),
+  Slazard (..),
+  DeltaQVisualisation (..),
+  module DeltaQ.Model.Utilities,
+  shiftedHeaviside,
+)
 where
 
-import           DeltaQ.Model.DeltaQ
-import           DeltaQ.Model.Introspection
-import           DeltaQ.Model.Utilities
+import DeltaQ.Model.DeltaQ
+import DeltaQ.Model.Introspection
+import DeltaQ.Model.Utilities
 
-import           PWPs.IRVs (IRV)
+import PWPs.IRVs (IRV)
 import qualified PWPs.IRVs as PWP
-
 
 instance ProbabilityMass Double where
   type ProbMassModel Double = Double
@@ -36,10 +37,11 @@ instance DeltaQ (IRV Double) where
   type ProbMass (IRV Double) = Double
   type Time (IRV Double) = Double
 
+  perfection :: IRV Double
   perfection = PWP.top
   bottom = PWP.bottom
 
-  support = (\(x,y) -> (x, Just y)) . PWP.support
+  support = (\(x, y) -> (x, Just y)) . PWP.support
 
   tangibleMass = PWP.probMass
 
@@ -75,5 +77,5 @@ instance DeltaQIntrospection (IRV Double) where
 instance DeltaQVisualisation (IRV Double) where
   asDiscreteCDF = PWP.asDiscreteCDF
   asDiscretePDF = PWP.asDiscretePDF
-  fromQTA xs = PWP.constructCDF $ (0,never) : xs
+  fromQTA xs = PWP.constructCDF $ (0, never) : xs
   fromEmpirical = PWP.constructLinearCDF
