@@ -58,7 +58,8 @@ library
     import:           warnings
 
     -- Modules exported by the library.
-    exposed-modules:  DeltaQ.PWPs
+    exposed-modules:  DeltaQ.Class
+                    , DeltaQ.PWPs
                     , PWPs.IRVs
 
     -- Modules included in this library but not exported.
@@ -66,6 +67,9 @@ library
                     , PWPs.PolyDeltas
                     , PWPs.SimplePolynomials
                     , PWPs.ConvolutionClasses
+                    , DeltaQ.Model.DeltaQ
+                    , DeltaQ.Model.Introspection
+                    , DeltaQ.Model.Utilities
 
     -- LANGUAGE extensions used by modules in this package.
     other-extensions:   GeneralizedNewtypeDeriving
@@ -75,10 +79,11 @@ library
                       , AllowAmbiguousTypes
                       , TypeSynonymInstances
                       , MonoLocalBinds
-                      
+
     -- Other library packages from which modules are imported.
     build-depends:    base
-                    , dqsd-classes
+                    , Chart
+                    , Chart-cairo
 
     -- Directories containing source files.
     hs-source-dirs:   src
