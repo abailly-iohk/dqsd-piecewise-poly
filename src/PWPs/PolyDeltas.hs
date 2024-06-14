@@ -146,11 +146,13 @@ instance MyConstraints a => Evaluable a (PolyHeaviside a) where
   scale = scalePH
 
 -- | Removes excess basepoints if the objects on either side are the same
-aggregate :: Eq a => [(a, PolyDelta a)] -> [(a, PolyDelta a)]
+aggregate :: (Eq a, Num a) => [(a, PolyDelta a)] -> [(a, PolyDelta a)]
 aggregate [] = error "Empty list of polydeltas"
 aggregate [x] = [x] -- need at least two elements to do anything
 aggregate ((bx, x) : (by, y) : xs)
   | x == y = aggregate $ (bx, x) : xs -- throw away the second basepoint
+  | bx == by && y == Pd zeroPoly = aggregate $ (bx, x) : xs -- throw away the second basepoint
+  | bx == by && x == Pd zeroPoly = aggregate $ (bx, y) : xs -- throw away the first basepoint
   | otherwise = (bx, x) : aggregate ((by, y) : xs)
 
 convolvePolyDeltas ::
