@@ -74,18 +74,15 @@ instance Functor (Pieces a) where
 -- |
 --     We run through a set of pieces, merging intervals whose objects are declared mergeable
 mergePieces :: Mergeable b => Pieces a b -> Pieces a b
-mergePieces f = fix mergeRecursive (False, getPieces f)
+mergePieces = Pieces . doMerge . getPieces
  where
-  doMerge [] = (True, []) -- can occur when we have merged the last two pieces
-  doMerge [x] = (True, [x]) -- stop when there's nothing left to merge
+  doMerge [] = [] -- can occur when we have merged the last two pieces
+  doMerge [x] = [x] -- stop when there's nothing left to merge
   doMerge (x0 : x1 : xs) = case mergeObject (object x0) (object x1) of
     Nothing ->
-      let (r, ps') = doMerge (x1 : xs)
-       in (r, x0 : ps') -- can't merge so just move on
+      x0 : doMerge (x1 : xs) -- can't merge so just move on
     Just o ->
-      (False, (Piece{basepoint = basepoint x0, object = o}) : snd (doMerge xs)) -- merge the two objects and move on
-  mergeRecursive _ (True, ps) = Pieces ps
-  mergeRecursive rec (False, ps) = rec (doMerge ps)
+      doMerge (Piece{basepoint = basepoint x0, object = o} : xs) -- merge the two objects and try again
 
 combinePieces :: (Num a, Eq a, Ord a, Mergeable b, Mergeable c, Mergeable d) => (b -> c -> d) -> Pieces a b -> Pieces a c -> Pieces a d
 
