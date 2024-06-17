@@ -77,6 +77,20 @@ scalePoly :: EqNum a => a -> Poly a -> Poly a
 -- | scale a polynomial by a constant: more efficient than multiplying by a constant polynomial
 scalePoly x (Poly xs) = Poly (map (* x) xs)
 
+{-# SCC addPolys #-}
+{-# SCC trimPoly #-}
+{-# SCC mulPolys #-}
+{-# SCC integratePoly #-}
+{-# SCC differentiatePoly #-}
+{-# SCC evaluatePoly #-}
+{-# SCC choose #-}
+{-# SCC convolvePolys #-}
+{-# SCC shiftPoly #-}
+{-# SCC displayPoly #-}
+{-# SCC countPolyRoots #-}
+{-# SCC euclidianDivision #-}
+{-# SCC compareToZero #-}
+{-# SCC findPolyRoot #-}
 addPolys :: EqNum a => Poly a -> Poly a -> Poly a
 
 -- |

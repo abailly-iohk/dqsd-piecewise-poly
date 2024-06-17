@@ -40,7 +40,6 @@ module PWPs.Piecewise (
   displayPolyDeltaIntervals,
 ) where
 
-import Data.Function (fix)
 import GHC.Stack (HasCallStack)
 import PWPs.ConvolutionClasses (
   CompactConvolvable (..),

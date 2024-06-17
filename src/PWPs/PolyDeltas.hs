@@ -19,8 +19,29 @@
 module PWPs.PolyDeltas where
 
 import GHC.Stack (HasCallStack)
-import PWPs.ConvolutionClasses
-import PWPs.SimplePolynomials as SP
+import PWPs.ConvolutionClasses (
+  CompactConvolvable (..),
+  Comparable (..),
+  Differentiable (..),
+  Displayable (..),
+  Evaluable (..),
+  Integrable (..),
+  Mergeable (..),
+ )
+import PWPs.SimplePolynomials as SP (
+  Poly,
+  compareToZero,
+  convolvePolys,
+  differentiatePoly,
+  displayPoly,
+  evaluatePoly,
+  findPolyRoot,
+  integratePoly,
+  makePoly,
+  scalePoly,
+  shiftPoly,
+  zeroPoly,
+ )
 
 -- |
 -- A PolyDelta either a polynomial, a (shifted, scaled) Delta or a (shifted, scaled) Heaviside.
